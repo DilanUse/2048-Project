@@ -1,1 +1,10 @@
-sceneSetups: []
+sceneSetups:
+- path: Assets/Scenes/Menu.unity
+  isLoaded: 1
+  isActive: 1
+- path: Assets/Scenes/Juego.unity
+  isLoaded: 0
+  isActive: 0
+- path: Assets/Scenes/Puntajes.unity
+  isLoaded: 0
+  isActive: 0
