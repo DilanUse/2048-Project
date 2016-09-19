@@ -26,9 +26,9 @@ public class Puntuaciones : MonoBehaviour
         nombres.text = puntos.text = "";
 
 
-        for (int i = 1; i < registros.Length; i++)
+        for (int i = 0; i < registros.Length - 1; i++)
         {
-            nombres.text += i + ".-" +  ( registros[i].nombre != null ? registros[i].nombre : "AAAAA" )
+            nombres.text += (i + 1) + ".-" +  ( registros[i].nombre != null ? registros[i].nombre : "AAAAA" )
                 + System.Environment.NewLine;
             puntos.text += registros[i].puntuacion + System.Environment.NewLine;
         } // fin del for
