@@ -13,10 +13,10 @@ public class Puntuacion
 
 
     // contructor paramterico
-    public Puntuacion( string nombre, int puntuacion )
+    public Puntuacion( string nombre, int puntuacion = 0 )
     {
         this.nombre = nombre;
-        this.puntuacion = 0;
+        this.puntuacion = puntuacion;
     } // fin del constructor 
 
 
