@@ -22,7 +22,6 @@ public class Puntuaciones : MonoBehaviour
     {
         this.LeerPuntaje();
 
-
         nombres.text = puntos.text = "";
 
 
@@ -77,16 +76,16 @@ public class Puntuaciones : MonoBehaviour
 
 
     // actualiza los puntajes ingresando uno nuevo y ordenandolos
-    public void actualizarPuntajes( Puntuacion nuevoPT )
+    public void actualizarPuntajes()
     {
         FileStream puntajes; //archivo
         StreamWriter puntajes_out; // flujo de salida
         int registro = 0;
 
 
-
+        Debug.Log("Se actualizo el puntaje");
         this.LeerPuntaje();
-        registros[11] = nuevoPT;
+        registros[10] = new Puntuacion( nombres.text, Convert.ToInt32(puntos.text) );
 
 
         try

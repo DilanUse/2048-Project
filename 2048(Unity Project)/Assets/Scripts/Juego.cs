@@ -1,38 +1,73 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.IO;
 
 
 public class Juego : MonoBehaviour
 {
     public int[,] tablero; // tablero del juego
+    private int[,] tableroAux; // tablero auxiliar para verificaciones del juego
     private bool[,] combinado; // determina que casillas se han combinado
     public Text puntaje; // puntajes del juego 
     public Text nomJug; // nombre del jugador
+    public Text record; // maxima puntuacion 
+    public GameObject win; // ventana emergente para indicar la victoria del usuario
+    public GameObject gameOver; // ventana emergente para indicar la derrota del usuario 
     public Sprite[] casillasSprite; // sprites de las casillas
     System.Random aleatorio; // para enteros aleatorios
     static bool press = false; // indica si se tiene presionada una tecla
-    static int puntuacion = 0;
+    static int puntuacion = 0; // cuenta la puntuacion 
+    static bool winner = false; // determina si ya el usuario gano el juego
 
 
     // inicia la matriz de centinelas que indica si se combino una casilla
     void iniciarCombinacines()
     {
         for (int i = 0; i < 4; i++)
-        {
             for (int j = 0; j < 4; j++)
-            {
                 combinado[i, j] = false;
-            }
-        }
     } // fin de iniciarCombinaciones
 
 
     // Use this for initialization ----------------------------------------------------------
     void Start()
     {
+        // lee los valores iniciales del juego 
+        FileStream archivo; // archivo
+        StreamReader valor_in; // flujo de salida
+        string[] buffer;
+        char[] separador = { ';' };
+
+
+
+        try
+        {
+            // abre el archivo con el nombre y lee el nombre
+            archivo = new FileStream("Assets/Save/Nombre.txt", FileMode.Open, FileAccess.Read);
+            using (valor_in = new StreamReader(archivo))
+            {
+                nomJug.text = valor_in.ReadLine();
+            } // fin del using
+
+
+            // abre el archivo con las puntuaciones y lee el primer puntaje
+            archivo = new FileStream("Assets/Save/Puntajes.txt", FileMode.Open, FileAccess.Read);
+            using (valor_in = new StreamReader(archivo))
+            {
+                buffer = valor_in.ReadLine().Split(separador);
+                record.text = buffer[1];
+            } // fin del using
+        } // fin del try
+        catch (IOException e)
+        {
+            Debug.Log(e.Message);
+        } // fin del try...catch 
+
+
         aleatorio = new System.Random(); // valor aleatorio
         tablero = new int[4, 4]; // inicia el tablero del juego
+        tableroAux = new int[4, 4]; // inicia el tablero auxiliar
         combinado = new bool[4, 4];
 
         crearCasillas(2); // crea dos casillas
@@ -221,6 +256,29 @@ public class Juego : MonoBehaviour
             press = false;
 
 
+
+        copiarTablero();
+        switch ( verificar() )
+        {
+            case 0:
+                break;
+            case 1:
+                if (!winner)
+                {
+                    winner = true;
+                    Debug.Log("Gano");
+                    win.SetActive(true);
+                    this.enabled = false;
+                }
+                break;
+            case 2:
+                Debug.Log("Perdio");
+                gameOver.SetActive(true);
+                this.enabled = false;
+                break;
+            default:
+                break;
+        } 
         actualizarImgCasillas();
     } // fin de FixedUpdate-------------------------------------------------------------------
 
@@ -286,5 +344,100 @@ public class Juego : MonoBehaviour
 
             tablero[fila, columna] = aleatorio.Next(1, 3) * 2;
         } // fin del for
-    } // fin de crearCasilla
+    } // fin de crearCasilla 
+
+
+
+    // evalua si se gano o perdio
+    int verificar()
+    {
+        int estado = 0; // determina el estado del Juego( 0:Continua/1:Gano/2:Perdio)
+
+        //-------------------------------VERIFICANDO SI GANO------------------------------------
+        for (int i = 0; i < 4; i++ )
+            for (int j = 0; j < 4; j++ )
+                if ( tablero[i, j] == 64 )
+                    estado = 1;
+
+
+         //----------------------------VERIFICANDO SI PERDIO-----------------------------------------
+        int estadoAux = 0; // determina si el tablero esta vacio
+
+
+        // verifico si el tablero esta llena
+        for (int fila = 0; fila < 4; fila++)
+            for (int col = 0; col < 4; col++)
+                if (tablero[fila, col] == 0)
+                    estadoAux = 1;
+
+
+        // si el tablero esta lleno
+        if (estadoAux == 0)
+        {
+            estado = 2; // Supongo que se perdio
+
+
+            // verifico si a la izquierda existe una combinacion
+            for (int i = 0; i < 4; i++)
+                for (int j = 0; j < 4; j++)
+                    if ( j > 0 && tableroAux[i, j - 1] == tableroAux[i, j])
+                    {
+                        estado = 0; // Continua el juego( se encontro una combinacion)
+                        return estado; // retorno el estado del juego 
+                    }//fin de else if
+
+
+            copiarTablero(); // copio de nuevo al tablero auxiliar el original 
+
+
+            // verifico si a la derecha existe una combinacion
+            for (int fila = 0; fila < 4; fila++)
+                for (int col = 3; col >= 0; col--)
+
+                    if (col < 3 && tableroAux[fila, col + 1] == tableroAux[fila, col])
+                    {
+                        estado = 0; // Continua el juego( se encontro una combinacion)
+                        return estado; // retorno el estado del juego
+                    }//fin de else if
+
+
+
+            copiarTablero(); // copio de nuevo al tablero auxiliar el original 
+
+
+            // verifico hacia abajo existe una combinacion
+            for (int fila = 3; fila >= 0; fila--)
+                for (int col = 0; col < 4; col++)
+                    if (fila < 3 && tableroAux[fila + 1, col] == tableroAux[fila, col])
+                    {
+                        estado = 0; // Continua el juego( se encontro una combinacion)
+                        return estado; // retorno el estado del juego
+                    }//fin de else if
+
+
+            copiarTablero(); // copio de nuevo al tablero auxiliar el original 
+
+
+            // verifico hacia abajo existe una combinacion
+            for (int fila = 0; fila < 4; fila++)
+                for (int col = 0; col < 4; col++)
+                    if (fila > 0 && tableroAux[fila - 1, col] == tableroAux[fila, col])
+                    {
+                        estado = 0; // Continua el juego( se encontro una combinacion)
+                        return estado; // retorno el estado del juego
+                    }//fin de else if
+        }//FIN DE VERIFICAR SI TIENE ALGUN MOVIMIENTO POSIBLE
+        
+
+        return estado; // retorno el estado del juego
+    }//fin de verificacion
+
+
+    // copia el tablero original a uno auxiliar
+    private void copiarTablero()
+    {
+        for (int i = 0; i < 3 + 1; i++)
+            for (int j = 0; j < 3 + 1; j++)
+                tableroAux[i, j] = tablero[i, j];
+    }//FIN DE COPIAR MATRIZ
 } // fin de Juego
