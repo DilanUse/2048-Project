@@ -17,8 +17,8 @@ public class Juego : MonoBehaviour
     public Sprite[] casillasSprite; // sprites de las casillas
     System.Random aleatorio; // para enteros aleatorios
     static bool press = false; // indica si se tiene presionada una tecla
-    static int puntuacion = 0; // cuenta la puntuacion 
-    static bool winner = false; // determina si ya el usuario gano el juego
+    int puntuacion; // cuenta la puntuacion 
+    bool winner; // determina si ya el usuario gano el juego
 
 
     // inicia la matriz de centinelas que indica si se combino una casilla
@@ -65,6 +65,9 @@ public class Juego : MonoBehaviour
         } // fin del try...catch 
 
 
+        press = false;
+        winner = false;
+        puntuacion = 0; // iniciar la puntuacion
         aleatorio = new System.Random(); // valor aleatorio
         tablero = new int[4, 4]; // inicia el tablero del juego
         tableroAux = new int[4, 4]; // inicia el tablero auxiliar
