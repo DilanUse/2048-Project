@@ -43,10 +43,11 @@ public class Puntuaciones : MonoBehaviour
         char[] separador = { ';' }; // delimitador
 
 
-
+        
         try
         {
-            puntajes = new FileStream("Assets/Save/Puntajes.txt", FileMode.Open, FileAccess.Read);
+            puntajes = new FileStream( Application.persistentDataPath + "/Puntajes.txt", 
+                FileMode.OpenOrCreate, FileAccess.Read);
 
            
             using ( puntajes_in = new StreamReader(puntajes) )
@@ -90,7 +91,8 @@ public class Puntuaciones : MonoBehaviour
 
         try
         {
-            puntajes = new FileStream("Assets/Save/Puntajes.txt", FileMode.Truncate, FileAccess.Write);
+            puntajes = new FileStream( Application.persistentDataPath + "/Puntajes.txt",
+                FileMode.Truncate, FileAccess.Write);
 
 
             using (puntajes_out = new StreamWriter(puntajes))

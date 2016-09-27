@@ -18,7 +18,7 @@ public class NombreJug : MonoBehaviour
 
         try
         {
-            nomJug = new FileStream("Assets/Save/Nombre.txt", FileMode.Create, FileAccess.Write);
+            nomJug = new FileStream( Application.persistentDataPath + "/Nombre.txt", FileMode.Create, FileAccess.Write);
 
 
             using (nom_out = new StreamWriter(nomJug))

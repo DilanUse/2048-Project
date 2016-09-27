@@ -20,6 +20,15 @@ public class Juego : MonoBehaviour
     int puntuacion; // cuenta la puntuacion 
     bool winner; // determina si ya el usuario gano el juego
 
+    enum Direccion{ derecha = 1, arriba = 2, izquierda = 3, abajo = 4, noImporta = 5 };
+
+
+    float timeTouch;  /// instante en el que se realizo un toque valido
+    /// ////////////////////
+    /// </summary>
+
+
+
 
     // inicia la matriz de centinelas que indica si se combino una casilla
     void iniciarCombinacines()
@@ -33,9 +42,12 @@ public class Juego : MonoBehaviour
     // Use this for initialization ----------------------------------------------------------
     void Start()
     {
+
+
+
         // lee los valores iniciales del juego 
         FileStream archivo; // archivo
-        StreamReader valor_in; // flujo de salida
+        StreamReader flujoIn; // flujo de salida
         string[] buffer;
         char[] separador = { ';' };
 
@@ -44,25 +56,36 @@ public class Juego : MonoBehaviour
         try
         {
             // abre el archivo con el nombre y lee el nombre
-            archivo = new FileStream("Assets/Save/Nombre.txt", FileMode.Open, FileAccess.Read);
-            using (valor_in = new StreamReader(archivo))
+            archivo = new FileStream( Application.persistentDataPath + "/Nombre.txt", 
+                FileMode.OpenOrCreate, FileAccess.Read);
+            using (flujoIn = new StreamReader(archivo))
             {
-                nomJug.text = valor_in.ReadLine();
+                nomJug.text = flujoIn.ReadLine();
             } // fin del using
 
 
             // abre el archivo con las puntuaciones y lee el primer puntaje
-            archivo = new FileStream("Assets/Save/Puntajes.txt", FileMode.Open, FileAccess.Read);
-            using (valor_in = new StreamReader(archivo))
+            archivo = new FileStream( Application.persistentDataPath + "/Puntajes.txt",
+                FileMode.OpenOrCreate, FileAccess.Read);
+            using (flujoIn = new StreamReader(archivo))
             {
-                buffer = valor_in.ReadLine().Split(separador);
-                record.text = buffer[1];
+                // si el archivo no esta vacio
+                if (archivo.Length > 0)
+                {
+                    buffer = flujoIn.ReadLine().Split(separador);
+                    record.text = buffer[1];
+                }
             } // fin del using
         } // fin del try
         catch (IOException e)
         {
             Debug.Log(e.Message);
-        } // fin del try...catch 
+        } // fin del try...catch */
+
+
+
+        timeTouch = 0;  /////////////////////////
+
 
 
         press = false;
@@ -79,13 +102,17 @@ public class Juego : MonoBehaviour
 
 
 	// FixedUpdate is called once per physic actualization-----------------------------------
-	void FixedUpdate ()
+	void Update ()
     {
         bool moved = false; // indica si se realizo algun movimiento
-        
 
-        if (Input.GetAxis("Horizontal") < 0 && !press)
+
+        //      if (Input.GetAxis("Horizontal") < 0 && !press)
+        // izquierda
+        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved && Time.time - timeTouch > 0.5f &&
+            getDireccion(Input.GetTouch(0).deltaPosition) == Direccion.izquierda)
         {
+            timeTouch = Time.time;
             // procesa los tres movimientos posibles para una casilla
             for (int move = 0; move < 3; move++)
             {
@@ -109,6 +136,7 @@ public class Juego : MonoBehaviour
                                 combinado[fila, col - 1] = true;
                                 moved = true;
                                 puntuacion += tablero[fila, col - 1] = tablero[fila, col] * 2;
+                                puntaje.text = puntuacion.ToString();
                                 tablero[fila, col] = 0;
                             } // fin del if...else
                         } // fin del if
@@ -126,8 +154,25 @@ public class Juego : MonoBehaviour
 
 
 
-        if (Input.GetAxis("Horizontal") > 0 && !press)
+        //if (Input.GetAxis("Horizontal") > 0 && !press)
+     /*   if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved && /*press &&*/
+         /*   (Input.GetTouch(0).deltaPosition.magnitude / Input.GetTouch(0).deltaTime) > 1500 &&
+             (Input.GetTouch(0).deltaPosition.magnitude / Input.GetTouch(0).deltaTime) < 1800 ) */
+             // derecha
+        if(Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved  && Time.time - timeTouch > 0.5f && 
+            getDireccion( Input.GetTouch(0).deltaPosition ) == Direccion.derecha )
         {
+            timeTouch = Time.time;
+
+            /*
+            Depurar.text = (Input.GetTouch(0).deltaPosition.magnitude / Input.GetTouch(0).deltaTime).ToString() +
+                " / " + (Time.time - timeTouch).ToString() + " / " +  
+                ( getDireccion( Input.GetTouch(0).deltaPosition ).ToString() ); */
+
+
+
+
+
             // procesa los tres movimientos posibles para una casilla
             for (int move = 0; move < 3; move++)
             {
@@ -151,6 +196,7 @@ public class Juego : MonoBehaviour
                                 combinado[fila, col + 1] = true;
                                 moved = true;
                                 puntuacion += tablero[fila, col + 1] = tablero[fila, col] * 2;
+                                puntaje.text = puntuacion.ToString();
                                 tablero[fila, col] = 0;
                             } // fin del if...else
                         } // fin del if
@@ -158,7 +204,8 @@ public class Juego : MonoBehaviour
                 } // fin del for que procesa las fila
             } // fin del for para los movimientos de una casilla
 
-            if(moved)
+
+        if (moved)
                 crearCasillas();
 
 
@@ -167,8 +214,13 @@ public class Juego : MonoBehaviour
 
 
 
-        if (Input.GetAxis("Vertical") < 0 && !press)
+        //if (Input.GetAxis("Vertical") < 0 && !press)
+        // abajo
+        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved && Time.time - timeTouch > 0.5f &&
+            getDireccion(Input.GetTouch(0).deltaPosition) == Direccion.abajo)
         {
+            timeTouch = Time.time;
+
             // procesa los tres movimientos posibles para una casilla
             for (int move = 0; move < 3; move++)
             {
@@ -192,6 +244,7 @@ public class Juego : MonoBehaviour
                                 combinado[fila + 1, col] = true;
                                 moved = true;
                                 puntuacion += tablero[fila + 1, col] = tablero[fila, col] * 2;
+                                puntaje.text = puntuacion.ToString();
                                 tablero[fila, col] = 0;
                             } // fin del if...else
                         } // fin del if
@@ -209,8 +262,12 @@ public class Juego : MonoBehaviour
 
 
 
-        if (Input.GetAxis("Vertical") > 0 && !press)
+        // arriba
+        //  if (Input.GetAxis("Vertical") > 0 && !press)
+        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved && Time.time - timeTouch > 0.5f &&
+            getDireccion(Input.GetTouch(0).deltaPosition) == Direccion.arriba)
         {
+            timeTouch = Time.time;
             // procesa los tres movimientos posibles para una casilla
             for (int move = 0; move < 3; move++)
             {
@@ -234,6 +291,7 @@ public class Juego : MonoBehaviour
                                 combinado[fila - 1, col] = true;
                                 moved = true;
                                 puntuacion += tablero[fila - 1, col] = tablero[fila, col] * 2;
+                                puntaje.text = puntuacion.ToString();
                                 tablero[fila, col] = 0;
                             } // fin del if...else
                         } // fin del if
@@ -250,13 +308,20 @@ public class Juego : MonoBehaviour
         } // fin del movimiento hacia arriba
 
 
-        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
-        {
-            press = true;
-            puntaje.text = puntuacion.ToString();
-        }
-        else
-            press = false;
+        // probando la entrada tactil 
+        //      if (Input.touchCount > 0)
+        //        GameObject.Find("Musica").GetComponent<AudioSource>().Stop();
+
+
+
+       // if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+       /*      if( Input.touchCount == 2 && Input.GetTouch(0).phase == TouchPhase.Moved )
+              {
+                  press = true;
+                  puntaje.text = puntuacion.ToString();
+              }
+              else
+                  press = false;  */
 
 
 
@@ -282,6 +347,8 @@ public class Juego : MonoBehaviour
             default:
                 break;
         } 
+
+
         actualizarImgCasillas();
     } // fin de FixedUpdate-------------------------------------------------------------------
 
@@ -439,8 +506,28 @@ public class Juego : MonoBehaviour
     // copia el tablero original a uno auxiliar
     private void copiarTablero()
     {
-        for (int i = 0; i < 3 + 1; i++)
-            for (int j = 0; j < 3 + 1; j++)
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
                 tableroAux[i, j] = tablero[i, j];
     }//FIN DE COPIAR MATRIZ
+
+
+    // determina la direccion de un deslizamiento 
+    private Direccion getDireccion( Vector2 deslizamiento )
+    {
+        float maxAngle = 45.0f; // maximo angulo permitido para una direccion
+
+
+        if (Vector2.Angle(Vector2.right, deslizamiento) < maxAngle) // derecha
+            return Direccion.derecha;
+        else if (Vector2.Angle(Vector2.up, deslizamiento) < maxAngle) // arriba
+            return Direccion.arriba;
+        else if (Vector2.Angle(Vector2.left, deslizamiento) < maxAngle) // izquierda
+            return Direccion.izquierda;
+        else if (Vector2.Angle(Vector2.down, deslizamiento) < maxAngle) // abajo
+            return Direccion.abajo;
+
+
+        return Direccion.noImporta;
+    } // fin de getDireccion
 } // fin de Juego
