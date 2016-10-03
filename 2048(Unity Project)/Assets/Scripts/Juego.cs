@@ -13,8 +13,7 @@ public class Juego : MonoBehaviour
     public Text nomJug; // nombre del jugador
     public Text record; // maxima puntuacion 
     public GameObject win; // ventana emergente para indicar la victoria del usuario
-    public GameObject gameOver; // ventana emergente para indicar la derrota del usuario
-    public Sprite casillaVaciaSprite; // sprite para la casilla vacia  
+    public GameObject gameOver; // ventana emergente para indicar la derrota del usuario 
     public Sprite[] casillasSprite; // sprites de las casillas
     System.Random aleatorio; // para enteros aleatorios
     static bool press = false; // indica si se tiene presionada una tecla
@@ -389,12 +388,11 @@ public class Juego : MonoBehaviour
 
 
                 // si no hay un cero en el tablero en la posicion (i,j) y no se a actualizado la imagne
-                if (tablero[i, j] != 0)
+                if (tablero[i, j] != 0 )
                     casillaImg.sprite = casillasSprite[getIndiceCasilla(tablero[i, j])]; // actualizo la imagen
 
-                else //if (casillaImg.sprite) // si no enotonces es cero, y si tiene una imagen 
-                    casillaImg.sprite = casillaVaciaSprite;
-                   // casillaImg.sprite = null; // quito la imagen de la casilla
+                else if (casillaImg.sprite) // si no enotnces es cero, y si tiene una imagen 
+                    casillaImg.sprite = null; // quito la imagen de la casilla
             } // fin del for interior
         } // fin del for exterior
     } // fin de actualizarImgCasillas
@@ -428,7 +426,7 @@ public class Juego : MonoBehaviour
         //-------------------------------VERIFICANDO SI GANO------------------------------------
         for (int i = 0; i < 4; i++ )
             for (int j = 0; j < 4; j++ )
-                if ( tablero[i, j] == 64 )
+                if ( tablero[i, j] == 2048 )
                     estado = 1;
 
 
